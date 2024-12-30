@@ -1,8 +1,8 @@
 #include <iostream>
 #include <cassert>
 #include <cuda_runtime.h>
-
-#include "../include/Benchmark.cuh"
+#include <chrono>
+#include "Benchmark.cuh"
 
 void printDeviceProperties(int deviceIndex) {
     cudaDeviceProp prop;
@@ -42,19 +42,20 @@ int main(int argc, char* argv[])
 	printDeviceProperties(0);
 	unsigned int i = (unsigned int)atoi(argv[1]);
 	std::cout << "i " << i << std::endl;	
-	size_t num_b = (1UL << 32); //defualt do 4 GB 
+
 	param_t pType;
-	pType.arrSize = (1UL << 10) << i; 
-	pType.numAccess = num_b / pType.arrSize; 
+	pType.arrSize = (1UL << 30); //default array size is 1 GB // limit is 8 GB for jetson 
+	pType.numAccess = i;
 	pType.blockSize = 512;
-        pType.gridSize = 1024 * 4;
+    pType.gridSize = 1024 * 32;
+
 	std::cout << "Block Size " << pType.blockSize 
-	<< "Grid Size " << pType.gridSize 
-	<< "Array Size " << pType.arrSize
-	<< "Num Access " << pType.numAccess << std::endl;	
+	<< " Grid Size " << pType.gridSize 
+	<< " Array Size " << pType.arrSize
+	<< " Num Access " << pType.numAccess << std::endl;	
 
 
 	readBWTest<unsigned int>(&pType);	
-	//std::cout << "Hello World!" << std::endl;
+
 	return 0;
 }

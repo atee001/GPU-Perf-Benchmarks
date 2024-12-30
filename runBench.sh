@@ -2,4 +2,5 @@
 
 make clean
 make
-./perf 1 20 
+./build/perf 1 20
+# ./perf 2 20

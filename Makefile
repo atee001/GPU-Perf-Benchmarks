@@ -1,21 +1,24 @@
 NVCC = nvcc
 CXX = g++
-CUDAFLAGS = -arch=sm_87
+CUDAFLAGS = --generate-code arch=compute_87,code=sm_87
 
+INCLUDE_DIR = ./include
+CXXFLAGS = -O3 -std=c++11
 
-SRCS = ./src/*.cu 
-OBJS = $(SRCS:.cu=.o)
-
-TARGET = perf
+SRCS = $(wildcard ./src/*.cu)
+OBJS = $(SRCS:./src/%.cu=./build/%.o) #src is in src dir put .o in build dir
+TARGET = ./build/perf
+$(shell mkdir -p ./build)
 
 all: $(TARGET)
 
-%.o: %.cu
-	$(NVCC) -O3 -std=c++11 $(CUDAFLAGS) -c $< -o $@
+./build/%.o: $(SRCS)
+	$(NVCC) $(CXXFLAGS) $(CUDAFLAGS) -I$(INCLUDE_DIR) -c $< -o $@
 
-$(TARGET): $(OBJS)
+$(TARGET): $(OBJS) 
 	$(NVCC) $(OBJS) -o $@ 
+
 clean:
-	rm -rf *.o $(TARGET)
+	rm -rf ./build/*.o $(TARGET)
 	
 
